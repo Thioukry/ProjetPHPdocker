@@ -1,0 +1,31 @@
+name: CI/CD Docker Pipeline
+
+# Déclenchement du workflow à chaque push sur main
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Étape 1 : récupérer le code
+      - name: Checkout du code
+        uses: actions/checkout@v3
+
+      # Étape 2 : connexion à Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      # Étape 3 : construire l'image Docker
+      - name: Build de l'image Docker
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/projet-php:latest .
+
+      # Étape 4 : pousser l'image sur Docker Hub
+      - name: Push de l'image Docker
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/projet-php:latest
